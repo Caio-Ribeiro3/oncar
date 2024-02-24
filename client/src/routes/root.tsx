@@ -1,4 +1,4 @@
-import { Outlet, useLoaderData } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { CssVarsProvider } from '@mui/joy/styles';
 import CssBaseline from '@mui/joy/CssBaseline';
 import Box from '@mui/joy/Box';
@@ -11,14 +11,13 @@ import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
-import { fetcher } from "../facade/fetcher";
+// import { fetcher } from "../facade/fetcher";
 
 export function loader() {
-    return fetcher.get<{}[]>('/car')
+    return {}
 }
 
 export default function JoyOrderDashboardTemplate() {
-    const cars = useLoaderData() as ReturnType<typeof loader>
     return (
         <CssVarsProvider disableTransitionOnChange>
             <CssBaseline />
