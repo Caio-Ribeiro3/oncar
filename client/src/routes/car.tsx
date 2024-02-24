@@ -42,7 +42,7 @@ import { fetcher } from '../facade/fetcher';
 //     return 0;
 // }
 
-type Order = 'asc' | 'desc';
+// type Order = 'asc' | 'desc';
 
 // function getComparator<Key extends keyof any>(
 //     order: Order,
