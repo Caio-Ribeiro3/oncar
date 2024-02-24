@@ -38,5 +38,5 @@ export class Fetcher {
 }
 
 export const fetcher = new Fetcher({
-    baseURL: 'http://localhost:3001/api/v1'
+    baseURL: process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001/api/v1'
 })
