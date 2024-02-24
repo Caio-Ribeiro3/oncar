@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node server/index.js",
-    "dev": "nodemon server/index.js",
+    "start": "node api/index.js",
+    "dev": "nodemon api/index.js",
     "build": "cd client && npm install && npm run build",
     "seed": "ts-node prisma/seed.js"
   },
