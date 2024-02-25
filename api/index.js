@@ -4,45 +4,46 @@ const express = require("express")
 const cors = require("cors");
 
 const db = require('./db/client');
+const paginatedEntities = require('./lib/paginatedEntity');
 
 const PORT = process.env.PORT || 3001;
 
 const app = express();
 
-app.get('/', (req, res) => {
-    res.redirect('/app')
-})
-
 app.use(cors())
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-app.use(express.urlencoded());
 app.use(express.static(path.resolve(__dirname, 'public')));
 
-app.get('/api/v1/hello', (req, res) => {
-    res.json({ hello: 'hello' })
-})
-
 app.get('/api/v1/car', async (req, res) => {
-    const cars = await db.car.findMany({
-        take: 10,
-        skip: 0,
-        select: {
-            id: true,
-            color: true,
-            model: {
-                select: {
-                    name: true,
-                    brand: true
+    const { page, limit } = req.query
+
+    const cars = await paginatedEntities({
+        ormEntity: db.car,
+        args: {
+            select: {
+                id: true,
+                color: true,
+                image: true,
+                price: true,
+                kilometers: true,
+                model: {
+                    select: {
+                        name: true,
+                        brand: true
+                    }
                 }
             }
-        }
+        },
+        page: page ? parseInt(page, 10) : undefined,
+        limit: limit ? parseInt(limit, 10) : undefined
     })
 
     res.json(cars)
 })
 
 app.post('/api/v1/car', async (req, res) => {
-    const { brand, model, color } = req.body
+    const { brand, model, color, image, kilometers, price } = req.body
 
     const hasBrand = await db.brand.findFirstOrThrow({ where: { id: brand } })
 
@@ -51,6 +52,9 @@ app.post('/api/v1/car', async (req, res) => {
     const car = await db.car.create({
         data: {
             color,
+            image,
+            kilometers,
+            price,
             model: {
                 connect: {
                     id: hasModel.id

@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import * as React from 'react';
 
-import { useLoaderData, ActionFunctionArgs, useSubmit } from 'react-router-dom';
+import { useLoaderData, ActionFunctionArgs, useSubmit, Link, useNavigate, LoaderFunctionArgs } from 'react-router-dom';
 
 import Box from '@mui/joy/Box';
 import Button from '@mui/joy/Button';
@@ -23,6 +23,7 @@ import { fetcher } from '../facade/fetcher';
 
 import Image from '../components/Image';
 import AddCarModal from '../components/AddCarModal';
+import { PaginatedEntity } from '../types';
 
 interface RowMenuProps {
     carId: string;
@@ -67,28 +68,42 @@ export async function action({ request }: ActionFunctionArgs) {
     switch (action) {
         case 'delete':
             const carId = formData.get('carId')
-            return fetcher.delete<{}>('/car', {
-                carId
+            return fetcher.delete('/car', {
+                data: {
+                    carId
+                }
             })
         case 'create':
             const brand = formData.get('brand')
             const model = formData.get('model')
             const color = formData.get('color')
-            return fetcher.post<{}>('/car', {
+            const kilometers = formData.get('kilometers') as string
+            const image = formData.get('image')
+            const price = formData.get('price') as string
+            return fetcher.post('/car', {
                 brand,
                 model,
-                color
+                color,
+                kilometers: parseInt(kilometers, 10),
+                image,
+                price: parseInt(price, 10)
             })
         default:
             throw new Error('invalid action')
     }
 }
 
-export async function loader() {
-    const [cars, brands] = await Promise.all([
-        fetcher.get<{
+export async function loader({ request }: LoaderFunctionArgs) {
+    const url = new URL(request.url)
+    const page = url.searchParams.get('page')
+    const limit = url.searchParams.get('limit')
+    const [{ data: cars }, { data: brands }] = await Promise.all([
+        fetcher.get<PaginatedEntity<{
             id: string;
             color: string;
+            image: string;
+            price: number;
+            kilometers: number;
             model: {
                 name: string;
                 brand: {
@@ -96,7 +111,7 @@ export async function loader() {
                     name: string;
                 }
             }
-        }[]>('/car'),
+        }>>(`/car${page && limit ? `?page=${page}&limit=${limit}` : ''}`),
         fetcher.get<{
             id: string;
             name: string;
@@ -114,6 +129,9 @@ export async function loader() {
 
 export default function CarRoute() {
     const { cars } = useLoaderData() as Awaited<ReturnType<typeof loader>>
+    const { count, data, page, limit } = cars
+    const navigate = useNavigate();
+
     const [openCreationModal, setOpenCreationModal] = React.useState(false);
 
     const renderFilters = () => (
@@ -171,24 +189,36 @@ export default function CarRoute() {
                 >
                     <thead>
                         <tr>
-                            <th style={{ width: 84, padding: '12px 6px' }} />
-                            <th style={{ width: 120, padding: '12px 6px' }}>
+                            <th style={{ width: 144, padding: '12px 6px' }} />
+                            <th>
                                 Modelo
                             </th>
-                            <th style={{ width: 140, padding: '12px 6px' }}>
+                            <th >
                                 Marca
                             </th>
-                            <th style={{ width: 140, padding: '12px 6px' }}>
+                            <th >
                                 Cor
                             </th>
-                            <th style={{ width: 140, padding: '12px 6px' }} />
+                            <th >
+                                Preço
+                            </th>
+                            <th >
+                                Quilometragem
+                            </th>
+                            <th />
                         </tr>
                     </thead>
                     <tbody>
-                        {cars.map((row) => (
+                        {data.map((row) => (
                             <tr key={row.id}>
-                                <td style={{ width: 84, padding: '12px 6px' }}>
-                                    <Image alt='' height={60} width={60} src='' style={{ borderRadius: 8 }} />
+                                <td style={{ width: 144, padding: '12px 6px' }}>
+                                    <Image
+                                        alt={`${row.model.name} image`}
+                                        height={120}
+                                        width={120}
+                                        src={row.image}
+                                        style={{ borderRadius: 8 }}
+                                    />
                                 </td>
                                 <td>
                                     <Typography level="body-xs">{row.model.name}</Typography>
@@ -198,6 +228,12 @@ export default function CarRoute() {
                                 </td>
                                 <td>
                                     <Typography level="body-xs">{row.color}</Typography>
+                                </td>
+                                <td>
+                                    <Typography level="body-xs">R$ {row.price}</Typography>
+                                </td>
+                                <td>
+                                    <Typography level="body-xs">{row.kilometers} KMs</Typography>
                                 </td>
                                 <td>
                                     <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
@@ -226,21 +262,29 @@ export default function CarRoute() {
                     variant="outlined"
                     color="neutral"
                     startDecorator={<KeyboardArrowLeftIcon />}
+                    disabled={page - 1 < 1}
+                    onClick={() => {
+                        navigate(`?limit=${limit}&page=${page - 1}`)
+                    }}
                 >
-                    Previous
+                    Anterior
                 </Button>
-
                 <Box sx={{ flex: 1 }} />
-                {['1', '2', '3', '…', '8', '9', '10'].map((page) => (
-                    <IconButton
-                        key={page}
-                        size="sm"
-                        variant={Number(page) ? 'outlined' : 'plain'}
-                        color="neutral"
-                    >
-                        {page}
-                    </IconButton>
-                ))}
+                {new Array(Math.ceil(count / limit)).fill(1).map((_, index) => index + 1)
+                    .map((page) => (
+                        <Link
+                            key={page}
+                            to={`?limit=${limit}&page=${page}`}
+                        >
+                            <IconButton
+                                size="sm"
+                                variant={Number(page) ? 'outlined' : 'plain'}
+                                color="neutral"
+                            >
+                                {page}
+                            </IconButton>
+                        </Link>
+                    ))}
                 <Box sx={{ flex: 1 }} />
 
                 <Button
@@ -248,8 +292,12 @@ export default function CarRoute() {
                     variant="outlined"
                     color="neutral"
                     endDecorator={<KeyboardArrowRightIcon />}
+                    disabled={page >= Math.ceil(count / limit)}
+                    onClick={() => {
+                        navigate(`?limit=${limit}&page=${page + 1}`)
+                    }}
                 >
-                    Next
+                    Próximo
                 </Button>
             </Box>
         </React.Fragment>

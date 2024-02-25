@@ -13,6 +13,9 @@ import CardContent from '@mui/joy/CardContent';
 import Select from '@mui/joy/Select';
 import Option from '@mui/joy/Option';
 import FormLabel from '@mui/joy/FormLabel';
+import FormHelperText from '@mui/joy/FormHelperText';
+
+import InfoOutlined from '@mui/icons-material/InfoOutlined';
 
 import { loader } from '../routes/car'
 
@@ -82,6 +85,12 @@ export default function AddCarModal(props: AddCarModalProps) {
                                 <Option key={el.id} value={el.id}>{el.name}</Option>
                             ))}
                         </Select>
+                        {!brand && (
+                            <FormHelperText>
+                                <InfoOutlined />
+                                Escolha uma marca antes
+                            </FormHelperText>
+                        )}
                     </FormControl>
 
                     <FormControl
@@ -91,6 +100,32 @@ export default function AddCarModal(props: AddCarModalProps) {
                             Cor
                         </FormLabel>
                         <Input name='color' />
+                    </FormControl>
+
+                    <FormControl
+                        required
+                    >
+                        <FormLabel id="select-field-demo-label" htmlFor="select-field-demo-button">
+                            Preço
+                        </FormLabel>
+                        <Input type='number' name='price' />
+                    </FormControl>
+                    <FormControl
+                        required
+                    >
+                        <FormLabel id="select-field-demo-label" htmlFor="select-field-demo-button">
+                            Quilometragem
+                        </FormLabel>
+                        <Input type='number' name='kilometers' />
+                    </FormControl>
+
+                    <FormControl
+                        required
+                    >
+                        <FormLabel id="select-field-demo-label" htmlFor="select-field-demo-button">
+                            Imagem
+                        </FormLabel>
+                        <Input name='image' />
                     </FormControl>
                     <CardContent orientation="horizontal">
                         <Button

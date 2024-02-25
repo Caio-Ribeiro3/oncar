@@ -34,7 +34,10 @@ model Model {
 model Car {
   id String @id @default(uuid())
 
-  color String
+  color      String
+  image      String
+  kilometers Int
+  price      Int
 
   model   Model  @relation(fields: [modelId], references: [id])
   modelId String

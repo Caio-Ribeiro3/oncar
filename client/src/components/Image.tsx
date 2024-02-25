@@ -1,4 +1,4 @@
-import AspectRatio from '@mui/joy/AspectRatio';
+// import AspectRatio from '@mui/joy/AspectRatio';
 
 interface ImageProps {
     src: string;
@@ -12,15 +12,13 @@ export default function Image(props: ImageProps) {
     const { height, src, width, alt, style } = props
 
     return (
-        <AspectRatio minHeight={`${height}px`} maxHeight={`${width}px`}>
-            <img
-                src={src}
-                width={width}
-                height={height}
-                alt={alt}
-                style={style}
-                loading="lazy"
-            />
-        </AspectRatio>
+        <img
+            src={src}
+            width={width}
+            height={height}
+            alt={alt}
+            style={{ objectFit: 'contain', ...style }}
+            loading="lazy"
+        />
     )
 }
