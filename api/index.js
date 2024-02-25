@@ -63,8 +63,11 @@ app.post('/api/v1/car', async (req, res) => {
 })
 
 app.get('/app*', (req, res) => {
-    console.log('aki')
     res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+});
+
+app.get('*', (req, res) => {
+    res.redirect('/app/error')
 });
 
 app.listen(PORT, () => {

@@ -1,6 +1,6 @@
 {
     "version": 2,
-    "outputDirectory": "/",
+    "outputDirectory": "/api",
     "buildCommand": "npm run build",
     "rewrites": [
         {
