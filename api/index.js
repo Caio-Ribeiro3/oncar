@@ -12,7 +12,7 @@ const app = express();
 app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded());
-app.use(express.static(path.resolve(__dirname, '..', 'public')));
+app.use(express.static(path.resolve(__dirname, 'public')));
 
 app.get('/api/v1/hello', (req, res) => {
     res.json({ hello: 'hello' })
@@ -59,9 +59,11 @@ app.post('/api/v1/car', async (req, res) => {
 })
 
 app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '..', 'public', 'index.html'));
+    res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
 
 app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
 });
+
+module.exports = app

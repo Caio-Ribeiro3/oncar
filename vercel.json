@@ -1,6 +1,5 @@
 {
     "version": 2,
-    "outputDirectory": "/server",
     "buildCommand": "npm run build",
     "rewrites": [
         {
