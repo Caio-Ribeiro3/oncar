@@ -66,10 +66,6 @@ app.get('/app*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
 
-app.get('*', (req, res) => {
-    res.redirect('/app/error')
-});
-
 app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
 });
