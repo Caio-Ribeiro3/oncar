@@ -1,20 +1,10 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import * as React from 'react';
 
-import { Form, useLoaderData } from 'react-router-dom';
+import { useLoaderData, ActionFunctionArgs, LoaderFunctionArgs, useSubmit } from 'react-router-dom';
 
 import Box from '@mui/joy/Box';
 import Button from '@mui/joy/Button';
-import Divider from '@mui/joy/Divider';
-import FormControl from '@mui/joy/FormControl';
-import FormLabel from '@mui/joy/FormLabel';
-import Link from '@mui/joy/Link';
-import Input from '@mui/joy/Input';
-import Modal from '@mui/joy/Modal';
-import ModalDialog from '@mui/joy/ModalDialog';
-import ModalClose from '@mui/joy/ModalClose';
-import Select from '@mui/joy/Select';
-import Option from '@mui/joy/Option';
 import Table from '@mui/joy/Table';
 import Sheet from '@mui/joy/Sheet';
 import IconButton, { iconButtonClasses } from '@mui/joy/IconButton';
@@ -24,51 +14,22 @@ import MenuButton from '@mui/joy/MenuButton';
 import MenuItem from '@mui/joy/MenuItem';
 import Dropdown from '@mui/joy/Dropdown';
 
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import SearchIcon from '@mui/icons-material/Search';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
 
+
 import { fetcher } from '../facade/fetcher';
 
-// function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-//     if (b[orderBy] < a[orderBy]) {
-//         return -1;
-//     }
-//     if (b[orderBy] > a[orderBy]) {
-//         return 1;
-//     }
-//     return 0;
-// }
+import Image from '../components/Image';
+import AddCarModal from '../components/AddCarModal';
 
-// type Order = 'asc' | 'desc';
+interface RowMenuProps {
+    carId: string;
+}
 
-// function getComparator<Key extends keyof any>(
-//     order: Order,
-//     orderBy: Key,
-// ): (
-//     a: { [key in Key]: number | string },
-//     b: { [key in Key]: number | string },
-// ) => number {
-//     return order === 'desc'
-//         ? (a, b) => descendingComparator(a, b, orderBy)
-//         : (a, b) => -descendingComparator(a, b, orderBy);
-// }
-
-// function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) {
-//     const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
-//     stabilizedThis.sort((a, b) => {
-//         const order = comparator(a[0], b[0]);
-//         if (order !== 0) {
-//             return order;
-//         }
-//         return a[1] - b[1];
-//     });
-//     return stabilizedThis.map((el) => el[0]);
-// }
-
-function RowMenu() {
+function RowMenu({ carId }: RowMenuProps) {
+    let submit = useSubmit();
     return (
         <Dropdown>
             <MenuButton
@@ -78,136 +39,103 @@ function RowMenu() {
                 <MoreHorizRoundedIcon />
             </MenuButton>
             <Menu size="sm" sx={{ minWidth: 140 }}>
-                <MenuItem>Edit</MenuItem>
-                <MenuItem>Rename</MenuItem>
-                <MenuItem>Move</MenuItem>
-                <Divider />
-                <MenuItem color="danger">Delete</MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        submit(
+                            { action: "delete", carId },
+                            {
+                                method: "post",
+                                encType: "application/x-www-form-urlencoded",
+                            }
+                        );
+                    }}
+                    sx={{ width: '100%' }}
+                    type="submit"
+                    component='button'
+                    color="danger"
+                >
+                    Delete
+                </MenuItem>
             </Menu>
         </Dropdown>
     );
 }
 
-export function action() {
-    return fetcher.post<{}>('/car', {
-        brand: 'Honda',
-        model: 'Civic',
-        color: 'red'
-    } as const)
+export async function action({ request }: ActionFunctionArgs) {
+    const formData = await request.formData()
+    const action = formData.get('action')
+    switch (action) {
+        case 'delete':
+            const carId = formData.get('carId')
+            return fetcher.delete<{}>('/car', {
+                carId
+            })
+        case 'create':
+            const brand = formData.get('brand')
+            const model = formData.get('model')
+            const color = formData.get('color')
+            return fetcher.post<{}>('/car', {
+                brand,
+                model,
+                color
+            })
+        default:
+            throw new Error('invalid action')
+    }
 }
 
-export function loader() {
-    return fetcher.get<{
-        id: string;
-        color: string;
-        model: {
+export async function loader({ }: LoaderFunctionArgs) {
+    const [cars, brands] = await Promise.all([
+        fetcher.get<{
+            id: string;
+            color: string;
+            model: {
+                name: string;
+                brand: {
+                    id: string;
+                    name: string;
+                }
+            }
+        }[]>('/car'),
+        fetcher.get<{
+            id: string;
             name: string;
-            brand: {
+            models: {
                 id: string;
                 name: string;
-            }
-        }
-    }[]>('/car')
+            }[]
+        }[]>('/brand'),
+    ])
+    return {
+        cars,
+        brands
+    }
 }
 
 export default function CarRoute() {
-    const cars = useLoaderData() as Awaited<ReturnType<typeof loader>>
-    // const [order, setOrder] = React.useState<Order>('desc');
-    // const [selected, setSelected] = React.useState<readonly string[]>([]);
+    const { cars, brands } = useLoaderData() as Awaited<ReturnType<typeof loader>>
     const [open, setOpen] = React.useState(false);
+    const [openCreationModal, setOpenCreationModal] = React.useState(false);
 
     const renderFilters = () => (
-        <>
-            <FormControl size="sm">
-                <FormLabel>Status</FormLabel>
-                <Select
-                    size="sm"
-                    placeholder="Filter by status"
-                    slotProps={{ button: { sx: { whiteSpace: 'nowrap' } } }}
-                >
-                    <Option value="paid">Paid</Option>
-                    <Option value="pending">Pending</Option>
-                    <Option value="refunded">Refunded</Option>
-                    <Option value="cancelled">Cancelled</Option>
-                </Select>
-            </FormControl>
-            <FormControl size="sm">
-                <FormLabel>Category</FormLabel>
-                <Select size="sm" placeholder="All">
-                    <Option value="all">All</Option>
-                    <Option value="refund">Refund</Option>
-                    <Option value="purchase">Purchase</Option>
-                    <Option value="debit">Debit</Option>
-                </Select>
-            </FormControl>
-            <FormControl size="sm">
-                <FormLabel>Customer</FormLabel>
-                <Select size="sm" placeholder="All">
-                    <Option value="all">All</Option>
-                    <Option value="olivia">Olivia Rhye</Option>
-                    <Option value="steve">Steve Hampton</Option>
-                    <Option value="ciaran">Ciaran Murray</Option>
-                    <Option value="marina">Marina Macdonald</Option>
-                    <Option value="charles">Charles Fulton</Option>
-                    <Option value="jay">Jay Hoper</Option>
-                </Select>
-            </FormControl>
-            <FormControl>
-                <Form method="post">
-                    <Button type="submit">
-                        Adicionar
-                    </Button>
-                </Form>
-            </FormControl>
-        </>
+        <Button
+            onClick={() => {
+                setOpenCreationModal(true)
+            }}
+        >
+            Adicionar
+        </Button>
     );
 
     return (
         <React.Fragment>
-            <Sheet
-                className="SearchAndFilters-mobile"
-                sx={{
-                    display: { xs: 'flex', sm: 'none' },
-                    my: 1,
-                    gap: 1,
-                }}
-            >
-                <Input
-                    size="sm"
-                    placeholder="Search"
-                    startDecorator={<SearchIcon />}
-                    sx={{ flexGrow: 1 }}
-                />
-                <IconButton
-                    size="sm"
-                    variant="outlined"
-                    color="neutral"
-                    onClick={() => setOpen(true)}
-                >
-                    <FilterAltIcon />
-                </IconButton>
-                <Modal open={open} onClose={() => setOpen(false)}>
-                    <ModalDialog aria-labelledby="filter-modal" layout="fullscreen">
-                        <ModalClose />
-                        <Typography id="filter-modal" level="h2">
-                            Filters
-                        </Typography>
-                        <Divider sx={{ my: 2 }} />
-                        <Sheet sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {renderFilters()}
-                            <Button color="primary" onClick={() => setOpen(false)}>
-                                Submit
-                            </Button>
-                        </Sheet>
-                    </ModalDialog>
-                </Modal>
-            </Sheet>
+            {openCreationModal && <AddCarModal setOpen={setOpenCreationModal} />}
             <Box
                 className="SearchAndFilters-tabletUp"
                 sx={{
                     borderRadius: 'sm',
                     py: 2,
-                    display: { xs: 'none', sm: 'flex' },
+                    display: 'flex',
                     flexWrap: 'wrap',
                     alignItems: 'flex-end',
                     gap: 1.5,
@@ -216,17 +144,13 @@ export default function CarRoute() {
                     },
                 }}
             >
-                <FormControl sx={{ flex: 1 }} size="sm">
-                    <FormLabel>Search for order</FormLabel>
-                    <Input size="sm" placeholder="Search" startDecorator={<SearchIcon />} />
-                </FormControl>
                 {renderFilters()}
             </Box>
             <Sheet
                 className="OrderTableContainer"
                 variant="outlined"
                 sx={{
-                    display: { xs: 'none', sm: 'initial' },
+                    display: 'initial',
                     width: '100%',
                     borderRadius: 'sm',
                     flexShrink: 1,
@@ -248,7 +172,7 @@ export default function CarRoute() {
                 >
                     <thead>
                         <tr>
-                            <th style={{ width: 140, padding: '12px 6px' }} />
+                            <th style={{ width: 84, padding: '12px 6px' }} />
                             <th style={{ width: 120, padding: '12px 6px' }}>
                                 Modelo
                             </th>
@@ -264,7 +188,9 @@ export default function CarRoute() {
                     <tbody>
                         {cars.map((row) => (
                             <tr key={row.id}>
-                                <td style={{ width: 140, padding: '12px 6px' }} />
+                                <td style={{ width: 84, padding: '12px 6px' }}>
+                                    <Image alt='' height={60} width={60} src='' style={{ borderRadius: 8 }} />
+                                </td>
                                 <td>
                                     <Typography level="body-xs">{row.model.name}</Typography>
                                 </td>
@@ -276,10 +202,7 @@ export default function CarRoute() {
                                 </td>
                                 <td>
                                     <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                                        <Link level="body-xs" component="button">
-                                            Download
-                                        </Link>
-                                        <RowMenu />
+                                        <RowMenu carId={row.id} />
                                     </Box>
                                 </td>
                             </tr>

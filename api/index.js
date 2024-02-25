@@ -44,9 +44,9 @@ app.get('/api/v1/car', async (req, res) => {
 app.post('/api/v1/car', async (req, res) => {
     const { brand, model, color } = req.body
 
-    const hasBrand = await db.brand.findFirstOrThrow({ where: { name: brand } })
+    const hasBrand = await db.brand.findFirstOrThrow({ where: { id: brand } })
 
-    const hasModel = await db.model.findFirstOrThrow({ where: { AND: [{ name: model }, { brandId: hasBrand.id }] } })
+    const hasModel = await db.model.findFirstOrThrow({ where: { AND: [{ id: model }, { brandId: hasBrand.id }] } })
 
     const car = await db.car.create({
         data: {
@@ -60,6 +60,51 @@ app.post('/api/v1/car', async (req, res) => {
     })
 
     res.json(car)
+})
+
+app.delete('/api/v1/car', async (req, res) => {
+    const { carId } = req.body
+
+    const car = await db.car.findFirst({
+        where: {
+            id: carId
+        },
+        select: {
+            model: true
+        }
+    })
+
+    await db.model.update({
+        where: {
+            id: car.model.id
+        },
+        data: {
+            cars: {
+                delete: {
+                    id: carId
+                }
+            }
+        }
+    })
+
+    res.json({ deleted: true })
+})
+
+app.get('/api/v1/brand', async (req, res) => {
+    const cars = await db.brand.findMany({
+        select: {
+            id: true,
+            name: true,
+            models: {
+                select: {
+                    name: true,
+                    id: true
+                }
+            }
+        }
+    })
+
+    res.json(cars)
 })
 
 app.get('/app*', (req, res) => {

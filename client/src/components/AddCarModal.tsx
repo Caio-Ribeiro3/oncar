@@ -1,0 +1,117 @@
+import * as React from 'react';
+
+import { Form, useLoaderData } from 'react-router-dom';
+
+import Box from '@mui/joy/Box';
+import Button from '@mui/joy/Button';
+import Divider from '@mui/joy/Divider';
+import FormControl from '@mui/joy/FormControl';
+import Input from '@mui/joy/Input';
+import Modal from '@mui/joy/Modal';
+import ModalDialog from '@mui/joy/ModalDialog';
+import ModalClose from '@mui/joy/ModalClose';
+import Table from '@mui/joy/Table';
+import Sheet from '@mui/joy/Sheet';
+import IconButton, { iconButtonClasses } from '@mui/joy/IconButton';
+import Typography from '@mui/joy/Typography';
+import Menu from '@mui/joy/Menu';
+import MenuButton from '@mui/joy/MenuButton';
+import MenuItem from '@mui/joy/MenuItem';
+import Dropdown from '@mui/joy/Dropdown';
+import Card from '@mui/joy/Card';
+import CardContent from '@mui/joy/CardContent';
+import Select from '@mui/joy/Select';
+import Option from '@mui/joy/Option';
+import FormLabel from '@mui/joy/FormLabel';
+
+import { loader } from '../routes/car'
+
+interface AddCarModalProps {
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function AddCarModal(props: AddCarModalProps) {
+    const { setOpen } = props
+
+    const { brands } = useLoaderData() as Awaited<ReturnType<typeof loader>>
+
+    const [brand, setBrand] = React.useState<string>()
+
+    return (
+        <Modal
+            open
+            onClose={() => {
+                setOpen(false)
+            }}>
+            <ModalDialog>
+                <ModalClose />
+                <Card
+                    component={Form}
+                    method="post"
+                    sx={{ width: 320, border: 'none' }}
+                    onSubmit={() => {
+                        setOpen(false)
+                    }}
+                >
+                    <input type='hidden' name='action' value='create' />
+                    <FormControl
+                        required
+                    >
+                        <FormLabel id="select-field-brand-label" htmlFor="select-field-brand-button">
+                            Marca
+                        </FormLabel>
+                        <Select
+                            name='brand'
+                            onChange={(_, newValue) => {
+                                setBrand(newValue as unknown as string)
+                            }}
+                            slotProps={{
+                                button: {
+                                    id: 'select-field-brand-button',
+                                    'aria-labelledby': 'select-field-brand-label select-field-brand-button',
+                                },
+                            }}
+                        >
+                            {brands.map(el => (
+                                <Option key={el.id} value={el.id}>{el.name}</Option>
+                            ))}
+                        </Select>
+                    </FormControl>
+
+                    <FormControl
+                        required
+                    >
+                        <FormLabel id="select-field-demo-label" htmlFor="select-field-demo-button">
+                            Modelo
+                        </FormLabel>
+                        <Select
+                            name='model'
+                            disabled={!brand}
+                        >
+                            {brands.find(el => el.id === brand)?.models.map(el => (
+                                <Option key={el.id} value={el.id}>{el.name}</Option>
+                            ))}
+                        </Select>
+                    </FormControl>
+
+                    <FormControl
+                        required
+                    >
+                        <FormLabel id="select-field-demo-label" htmlFor="select-field-demo-button">
+                            Cor
+                        </FormLabel>
+                        <Input name='color' />
+                    </FormControl>
+                    <CardContent orientation="horizontal">
+                        <Button
+                            sx={{ flex: 1 }}
+                            type="submit"
+                        >
+                            Confirmar
+                        </Button>
+                    </CardContent>
+                </Card>
+            </ModalDialog>
+        </Modal>
+    )
+}

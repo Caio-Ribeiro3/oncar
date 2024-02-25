@@ -35,6 +35,21 @@ export class Fetcher {
             return res.json()
         }) as unknown as Response
     }
+
+    delete<Response>(to: string, body?: Record<string, unknown>) {
+        return fetch(`${this.baseURL}${to}`, {
+            method: 'DELETE',
+            body: JSON.stringify(body),
+            headers: {
+                'content-type': 'application/json'
+            }
+        }).then(res => {
+            if (!res.ok) {
+                throw new Error('request error')
+            }
+            return res.json()
+        }) as unknown as Response
+    }
 }
 
 export const fetcher = new Fetcher({

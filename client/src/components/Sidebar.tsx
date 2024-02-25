@@ -10,45 +10,12 @@ import ListItemButton, { listItemButtonClasses } from '@mui/joy/ListItemButton';
 import ListItemContent from '@mui/joy/ListItemContent';
 import Typography from '@mui/joy/Typography';
 import Sheet from '@mui/joy/Sheet';
-import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import CarIcon from '@mui/icons-material/CarRental';
 
 // import ColorSchemeToggle from './ColorSchemeToggle';
 import { closeSidebar } from '../utils';
-
-function Toggler({
-    defaultExpanded = false,
-    renderToggle,
-    children,
-}: {
-    defaultExpanded?: boolean;
-    children: React.ReactNode;
-    renderToggle: (params: {
-        open: boolean;
-        setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    }) => React.ReactNode;
-}) {
-    const [open, setOpen] = React.useState(defaultExpanded);
-    return (
-        <React.Fragment>
-            {renderToggle({ open, setOpen })}
-            <Box
-                sx={{
-                    display: 'grid',
-                    gridTemplateRows: open ? '1fr' : '0fr',
-                    transition: '0.2s ease',
-                    '& > *': {
-                        overflow: 'hidden',
-                    },
-                }}
-            >
-                {children}
-            </Box>
-        </React.Fragment>
-    );
-}
+import { Link } from 'react-router-dom';
 
 export default function Sidebar() {
     return (
@@ -126,65 +93,31 @@ export default function Sidebar() {
                         '--ListItem-radius': (theme) => theme.vars.radius.sm,
                     }}
                 >
-                    <ListItem>
-                        <ListItemButton>
-                            <CarIcon />
-                            <ListItemContent>
-                                <Typography level="title-sm">
-                                    Carros
-                                </Typography>
-                            </ListItemContent>
-                        </ListItemButton>
-                    </ListItem>
-
-                    <ListItem nested>
-                        <Toggler
-                            renderToggle={({ open, setOpen }) => (
-                                <ListItemButton onClick={() => setOpen(!open)}>
-                                    <AssignmentRoundedIcon />
-                                    <ListItemContent>
-                                        <Typography level="title-sm">Tasks</Typography>
-                                    </ListItemContent>
-                                    <KeyboardArrowDownIcon
-                                        sx={{ transform: open ? 'rotate(180deg)' : 'none' }}
-                                    />
-                                </ListItemButton>
-                            )}
-                        >
-                            <List sx={{ gap: 0.5 }}>
-                                <ListItem sx={{ mt: 0.5 }}>
-                                    <ListItemButton>All tasks</ListItemButton>
-                                </ListItem>
-                                <ListItem>
-                                    <ListItemButton>Backlog</ListItemButton>
-                                </ListItem>
-                                <ListItem>
-                                    <ListItemButton>In progress</ListItemButton>
-                                </ListItem>
-                                <ListItem>
-                                    <ListItemButton>Done</ListItemButton>
-                                </ListItem>
-                            </List>
-                        </Toggler>
-                    </ListItem>
-
+                    <Link to='car'>
+                        <ListItem>
+                            <ListItemButton>
+                                <CarIcon />
+                                <ListItemContent>
+                                    <Typography level="title-sm">
+                                        Veículos
+                                    </Typography>
+                                </ListItemContent>
+                            </ListItemButton>
+                        </ListItem>
+                    </Link>
+                    <Link to='simulation'>
+                        <ListItem>
+                            <ListItemButton>
+                                <CarIcon />
+                                <ListItemContent>
+                                    <Typography level="title-sm">
+                                        Simulações
+                                    </Typography>
+                                </ListItemContent>
+                            </ListItemButton>
+                        </ListItem>
+                    </Link>
                 </List>
-
-            </Box>
-            <Divider />
-            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                <Avatar
-                    variant="outlined"
-                    size="sm"
-                    src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=286"
-                />
-                <Box sx={{ minWidth: 0, flex: 1 }}>
-                    <Typography level="title-sm">Siriwat K.</Typography>
-                    <Typography level="body-xs">siriwatk@test.com</Typography>
-                </Box>
-                <IconButton size="sm" variant="plain" color="neutral">
-                    <LogoutRoundedIcon />
-                </IconButton>
             </Box>
         </Sheet>
     );
