@@ -14,6 +14,10 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.static(path.resolve(__dirname, '..', 'public')));
 
+app.get('/api/v1/hello', (req, res) => {
+    res.json({ hello: 'hello' })
+})
+
 app.get('/api/v1/car', async (req, res) => {
     const cars = await db.car.findMany({
         take: 10,
