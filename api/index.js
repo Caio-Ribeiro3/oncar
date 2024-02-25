@@ -37,7 +37,6 @@ app.post('/api/v1/car', async (req, res) => {
     const { brand, model, color } = req.body
 
     const hasBrand = await db.brand.findFirstOrThrow({ where: { name: brand }, include: { models: true } })
-    console.log(hasBrand.models)
 
     const hasModel = await db.model.findFirstOrThrow({ where: { AND: [{ name: model }, { brandId: hasBrand.id }] } })
 
@@ -56,7 +55,7 @@ app.post('/api/v1/car', async (req, res) => {
 })
 
 app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '..', 'public'));
+    res.sendFile(path.resolve(__dirname, '..', 'public', 'index.html'));
 });
 
 app.listen(PORT, () => {
