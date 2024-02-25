@@ -40,7 +40,7 @@ app.get('/api/v1/car', async (req, res) => {
 app.post('/api/v1/car', async (req, res) => {
     const { brand, model, color } = req.body
 
-    const hasBrand = await db.brand.findFirstOrThrow({ where: { name: brand }, include: { models: true } })
+    const hasBrand = await db.brand.findFirstOrThrow({ where: { name: brand } })
 
     const hasModel = await db.model.findFirstOrThrow({ where: { AND: [{ name: model }, { brandId: hasBrand.id }] } })
 
