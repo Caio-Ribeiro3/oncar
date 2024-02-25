@@ -12,7 +12,7 @@ const app = express();
 app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded());
-app.use(express.static(path.resolve(__dirname, '../client/build')));
+app.use(express.static(path.resolve(__dirname, '..', 'public')));
 
 app.get('/api/v1/car', async (req, res) => {
     const cars = await db.car.findMany({
@@ -56,7 +56,7 @@ app.post('/api/v1/car', async (req, res) => {
 })
 
 app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
+    res.sendFile(path.resolve(__dirname, '..', 'public'));
 });
 
 app.listen(PORT, () => {
