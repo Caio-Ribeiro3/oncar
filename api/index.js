@@ -9,6 +9,10 @@ const PORT = process.env.PORT || 3001;
 
 const app = express();
 
+app.get('/', (req, res) => {
+    res.redirect('/app')
+})
+
 app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded());
@@ -58,7 +62,8 @@ app.post('/api/v1/car', async (req, res) => {
     res.json(car)
 })
 
-app.get('*', (req, res) => {
+app.get('/app*', (req, res) => {
+    console.log('aki')
     res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
 

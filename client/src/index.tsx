@@ -15,7 +15,7 @@ import CarRoute, { loader as carLoader, action as carAction } from './routes/car
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/app",
     element: <Root />,
     loader: rootLoader,
     children: [
