@@ -1,19 +1,13 @@
-import * as React from 'react';
 import GlobalStyles from '@mui/joy/GlobalStyles';
-import Avatar from '@mui/joy/Avatar';
 import Box from '@mui/joy/Box';
-import Divider from '@mui/joy/Divider';
-import IconButton from '@mui/joy/IconButton';
 import List from '@mui/joy/List';
 import ListItem from '@mui/joy/ListItem';
 import ListItemButton, { listItemButtonClasses } from '@mui/joy/ListItemButton';
 import ListItemContent from '@mui/joy/ListItemContent';
 import Typography from '@mui/joy/Typography';
 import Sheet from '@mui/joy/Sheet';
-import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import CarIcon from '@mui/icons-material/CarRental';
 
-// import ColorSchemeToggle from './ColorSchemeToggle';
 import { closeSidebar } from '../utils';
 import { Link } from 'react-router-dom';
 

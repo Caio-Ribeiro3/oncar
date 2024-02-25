@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import * as React from 'react';
 
-import { useLoaderData, ActionFunctionArgs, LoaderFunctionArgs, useSubmit } from 'react-router-dom';
+import { useLoaderData, ActionFunctionArgs, useSubmit } from 'react-router-dom';
 
 import Box from '@mui/joy/Box';
 import Button from '@mui/joy/Button';
@@ -84,7 +84,7 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 }
 
-export async function loader({ }: LoaderFunctionArgs) {
+export async function loader() {
     const [cars, brands] = await Promise.all([
         fetcher.get<{
             id: string;
@@ -113,8 +113,7 @@ export async function loader({ }: LoaderFunctionArgs) {
 }
 
 export default function CarRoute() {
-    const { cars, brands } = useLoaderData() as Awaited<ReturnType<typeof loader>>
-    const [open, setOpen] = React.useState(false);
+    const { cars } = useLoaderData() as Awaited<ReturnType<typeof loader>>
     const [openCreationModal, setOpenCreationModal] = React.useState(false);
 
     const renderFilters = () => (
