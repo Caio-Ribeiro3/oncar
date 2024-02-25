@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node api/index.js",
     "dev": "nodemon api/index.js",
-    "build": "npx prisma generate && cd client && npm install && npm run build",
+    "build": "prisma generate && prisma db push && cd client && npm install && npm run build",
     "seed": "ts-node prisma/seed.js"
   },
   "keywords": [],
