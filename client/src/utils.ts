@@ -1,3 +1,5 @@
+import muiDebounce from '@mui/material/utils/debounce';
+
 export function openSidebar() {
     if (typeof window !== 'undefined') {
         document.body.style.overflow = 'hidden';
@@ -24,3 +26,5 @@ export function toggleSidebar() {
         }
     }
 }
+
+export const debounce = muiDebounce

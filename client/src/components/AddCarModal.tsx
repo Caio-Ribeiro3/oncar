@@ -17,7 +17,7 @@ import FormHelperText from '@mui/joy/FormHelperText';
 
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
 
-import { loader } from '../routes/car'
+import { loader } from '../routes/dashboard/car'
 
 interface AddCarModalProps {
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;

@@ -19,11 +19,11 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
 
 
-import { fetcher } from '../facade/fetcher';
+import { fetcher } from '../../facade/fetcher';
 
-import Image from '../components/Image';
-import AddCarModal from '../components/AddCarModal';
-import { PaginatedEntity } from '../types';
+import Image from '../../components/Image';
+import AddCarModal from '../../components/AddCarModal';
+import { getBrands, getPaginatedCars } from '../../requests';
 
 interface RowMenuProps {
     carId: string;
@@ -46,7 +46,6 @@ function RowMenu({ carId }: RowMenuProps) {
                             { action: "delete", carId },
                             {
                                 method: "post",
-                                encType: "application/x-www-form-urlencoded",
                             }
                         );
                     }}
@@ -97,29 +96,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const url = new URL(request.url)
     const page = url.searchParams.get('page')
     const limit = url.searchParams.get('limit')
-    const [{ data: cars }, { data: brands }] = await Promise.all([
-        fetcher.get<PaginatedEntity<{
-            id: string;
-            color: string;
-            image: string;
-            price: number;
-            kilometers: number;
-            model: {
-                name: string;
-                brand: {
-                    id: string;
-                    name: string;
-                }
-            }
-        }>>(`/car${page && limit ? `?page=${page}&limit=${limit}` : ''}`),
-        fetcher.get<{
-            id: string;
-            name: string;
-            models: {
-                id: string;
-                name: string;
-            }[]
-        }[]>('/brand'),
+    const [cars, brands] = await Promise.all([
+        getPaginatedCars(page, limit),
+        getBrands(),
     ])
     return {
         cars,
@@ -230,10 +209,10 @@ export default function CarRoute() {
                                     <Typography level="body-xs">{row.color}</Typography>
                                 </td>
                                 <td>
-                                    <Typography level="body-xs">R$ {row.price}</Typography>
+                                    <Typography level="body-xs">R$ {row.price.toLocaleString()}</Typography>
                                 </td>
                                 <td>
-                                    <Typography level="body-xs">{row.kilometers} KMs</Typography>
+                                    <Typography level="body-xs">{row.kilometers.toLocaleString()} KMs</Typography>
                                 </td>
                                 <td>
                                     <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
@@ -302,4 +281,9 @@ export default function CarRoute() {
             </Box>
         </React.Fragment>
     );
+}
+
+export const heading = {
+    match: '/dashboard/car',
+    name: 'Veículos'
 }

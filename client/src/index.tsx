@@ -10,22 +10,36 @@ import CssBaseline from '@mui/joy/CssBaseline';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 
-import Root, { loader as rootLoader } from './routes/root';
-import CarRoute, { loader as carLoader, action as carAction } from './routes/car';
+import DashboardRoot, { loader as rootLoader } from './routes/dashboard/root';
+import DashboardCarRoute, { loader as carLoader, action as carAction } from './routes/dashboard/car';
+import AppHomepageCarRoute, { loader as appHomepageLoader, action as appHomepageAction } from './routes/app/homepage';
+import AppSingleCarRoute, { loader as appSingleCarLoader, action as appSingleCarAction } from './routes/app/single-car';
 
 const router = createBrowserRouter([
   {
-    path: "/app",
-    element: <Root />,
+    path: "/dashboard",
+    element: <DashboardRoot />,
     loader: rootLoader,
     children: [
       {
         path: "car",
         loader: carLoader,
         action: carAction,
-        element: <CarRoute />
+        element: <DashboardCarRoute />
       },
     ]
+  },
+  {
+    path: "/app",
+    element: <AppHomepageCarRoute />,
+    loader: appHomepageLoader,
+    action: appHomepageAction,
+  },
+  {
+    path: "/app/car/:id",
+    loader: appSingleCarLoader,
+    action: appSingleCarAction,
+    element: <AppSingleCarRoute />
   },
 ]);
 

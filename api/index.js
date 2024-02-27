@@ -16,7 +16,25 @@ app.use(express.json());
 app.use(express.static(path.resolve(__dirname, 'public')));
 
 app.get('/api/v1/car', async (req, res) => {
-    const { page, limit } = req.query
+    const { page, limit, brand, model, color } = req.query
+
+    const where = {
+        model: {
+            brand: {
+                id: brand || undefined
+            },
+            id: model || undefined
+        },
+        color: color || undefined,
+        price: {
+            gte: parseInt(req.query['price-from'], 10) || undefined,
+            lte: parseInt(req.query['price-to'], 10) || undefined
+        },
+        kilometers: {
+            gte: parseInt(req.query['kilometer-from'], 10) || undefined,
+            lte: parseInt(req.query['kilometer-to'], 10) || undefined
+        }
+    }
 
     const cars = await paginatedEntities({
         ormEntity: db.car,
@@ -33,7 +51,8 @@ app.get('/api/v1/car', async (req, res) => {
                         brand: true
                     }
                 }
-            }
+            },
+            where
         },
         page: page ? parseInt(page, 10) : undefined,
         limit: limit ? parseInt(limit, 10) : undefined
@@ -112,6 +131,10 @@ app.get('/api/v1/brand', async (req, res) => {
 })
 
 app.get('/app*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+});
+
+app.get('/dashboard*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
 
