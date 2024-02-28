@@ -36,7 +36,7 @@ const router = createBrowserRouter([
     action: appHomepageAction,
   },
   {
-    path: "/app/car/:id",
+    path: "/app/car/:carId",
     loader: appSingleCarLoader,
     action: appSingleCarAction,
     element: <AppSingleCarRoute />

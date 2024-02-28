@@ -1,17 +1,17 @@
+import { PropsWithChildren } from 'react';
+
 import GlobalStyles from '@mui/joy/GlobalStyles';
 import Box from '@mui/joy/Box';
-import List from '@mui/joy/List';
-import ListItem from '@mui/joy/ListItem';
-import ListItemButton, { listItemButtonClasses } from '@mui/joy/ListItemButton';
-import ListItemContent from '@mui/joy/ListItemContent';
 import Typography from '@mui/joy/Typography';
 import Sheet from '@mui/joy/Sheet';
-import CarIcon from '@mui/icons-material/CarRental';
 
 import { closeSidebar } from '../utils';
-import { Link } from 'react-router-dom';
+import { SIDEBAR_Z_INDEX } from '../constants';
 
-export default function Sidebar() {
+export type SidebarProps = PropsWithChildren<{ width?: number; }>
+
+export default function Sidebar(props: SidebarProps) {
+    const { children, width = 220 } = props
     return (
         <Sheet
             className="Sidebar"
@@ -22,7 +22,7 @@ export default function Sidebar() {
                     md: 'none',
                 },
                 transition: 'transform 0.4s, width 0.4s',
-                zIndex: 10000,
+                zIndex: SIDEBAR_Z_INDEX,
                 height: '100dvh',
                 width: 'var(--Sidebar-width)',
                 top: 0,
@@ -38,9 +38,9 @@ export default function Sidebar() {
             <GlobalStyles
                 styles={(theme) => ({
                     ':root': {
-                        '--Sidebar-width': '220px',
+                        '--Sidebar-width': `${width}px`,
                         [theme.breakpoints.up('lg')]: {
-                            '--Sidebar-width': '240px',
+                            '--Sidebar-width': `${width + 20}px`,
                         },
                     },
                 })}
@@ -49,7 +49,7 @@ export default function Sidebar() {
                 className="Sidebar-overlay"
                 sx={{
                     position: 'fixed',
-                    zIndex: 9998,
+                    zIndex: SIDEBAR_Z_INDEX - 2,
                     top: 0,
                     left: 0,
                     width: '100vw',
@@ -67,52 +67,7 @@ export default function Sidebar() {
             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                 <Typography level="title-lg">Oncar</Typography>
             </Box>
-            <Box
-                sx={{
-                    minHeight: 0,
-                    overflow: 'hidden auto',
-                    flexGrow: 1,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    [`& .${listItemButtonClasses.root}`]: {
-                        gap: 1.5,
-                    },
-                }}
-            >
-                <List
-                    size="sm"
-                    sx={{
-                        gap: 1,
-                        '--List-nestedInsetStart': '30px',
-                        '--ListItem-radius': (theme) => theme.vars.radius.sm,
-                    }}
-                >
-                    <Link to='car'>
-                        <ListItem>
-                            <ListItemButton>
-                                <CarIcon />
-                                <ListItemContent>
-                                    <Typography level="title-sm">
-                                        Veículos
-                                    </Typography>
-                                </ListItemContent>
-                            </ListItemButton>
-                        </ListItem>
-                    </Link>
-                    <Link to='simulation'>
-                        <ListItem>
-                            <ListItemButton>
-                                <CarIcon />
-                                <ListItemContent>
-                                    <Typography level="title-sm">
-                                        Simulações
-                                    </Typography>
-                                </ListItemContent>
-                            </ListItemButton>
-                        </ListItem>
-                    </Link>
-                </List>
-            </Box>
+            {children}
         </Sheet>
     );
 }

@@ -28,3 +28,11 @@ export function toggleSidebar() {
 }
 
 export const debounce = muiDebounce
+
+export function formatPrice(value: number) {
+    return `R$ ${value.toLocaleString()}`
+}
+
+export function formatKilometers(value: number) {
+    return `${value.toLocaleString()} KMs`
+}

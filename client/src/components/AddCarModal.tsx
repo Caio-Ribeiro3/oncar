@@ -65,6 +65,7 @@ export default function AddCarModal(props: AddCarModalProps) {
                                 },
                             }}
                         >
+                            <Option value={''}>Selecione</Option>
                             {brands.map(el => (
                                 <Option key={el.id} value={el.id}>{el.name}</Option>
                             ))}
@@ -81,6 +82,7 @@ export default function AddCarModal(props: AddCarModalProps) {
                             name='model'
                             disabled={!brand}
                         >
+                            <Option value={''}>Selecione</Option>
                             {brands.find(el => el.id === brand)?.models.map(el => (
                                 <Option key={el.id} value={el.id}>{el.name}</Option>
                             ))}

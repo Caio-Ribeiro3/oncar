@@ -39,6 +39,29 @@ model Car {
   kilometers Int
   price      Int
 
-  model   Model  @relation(fields: [modelId], references: [id])
-  modelId String
+  simulations Simulation[]
+  model       Model        @relation(fields: [modelId], references: [id])
+  modelId     String
+}
+
+model Lead {
+  id String @id @default(uuid())
+
+  name  String
+  cpf   String @unique
+  email String
+  phone String
+
+  simulations Simulation[]
+}
+
+model Simulation {
+  id String @id @default(uuid())
+
+  score Int
+
+  car    Car    @relation(fields: [carId], references: [id])
+  carId  String
+  lead   Lead   @relation(fields: [leadId], references: [id])
+  leadId String
 }

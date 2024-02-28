@@ -5,6 +5,7 @@ const cors = require("cors");
 
 const db = require('./db/client');
 const paginatedEntities = require('./lib/paginatedEntity');
+const calculateLeadScore = require('./lib/calculateLeadScore');
 
 const PORT = process.env.PORT || 3001;
 
@@ -59,6 +60,31 @@ app.get('/api/v1/car', async (req, res) => {
     })
 
     res.json(cars)
+})
+
+app.get('/api/v1/car/:carId', async (req, res) => {
+    const { carId } = req.params
+
+    const car = await db.car.findFirstOrThrow({
+        where: {
+            id: carId
+        },
+        select: {
+            id: true,
+            color: true,
+            image: true,
+            price: true,
+            kilometers: true,
+            model: {
+                select: {
+                    name: true,
+                    brand: true
+                }
+            }
+        }
+    })
+
+    res.json(car)
 })
 
 app.post('/api/v1/car', async (req, res) => {
@@ -128,6 +154,35 @@ app.get('/api/v1/brand', async (req, res) => {
     })
 
     res.json(cars)
+})
+
+app.post('/api/v1/simulation', async (req, res) => {
+    const { carId, name, email, phone, cpf } = req.body
+
+    await db.car.findFirstOrThrow({ where: { id: carId } })
+
+    let lead = await db.lead.findFirst({ where: { cpf } })
+
+    if (!lead) {
+        lead = await db.lead.create({
+            data: {
+                name,
+                email,
+                phone,
+                cpf
+            }
+        })
+    }
+
+    const simulation = await db.simulation.create({
+        data: {
+            score: await calculateLeadScore(lead),
+            carId,
+            leadId: lead.id
+        }
+    })
+
+    res.json(simulation)
 })
 
 app.get('/app*', (req, res) => {
