@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useActionData } from 'react-router-dom';
 
@@ -7,9 +7,10 @@ import ModalClose from '@mui/joy/ModalClose';
 import Typography from '@mui/joy/Typography';
 import Sheet from '@mui/joy/Sheet';
 
-export default function SimulationDialog() {
+import { Simulation } from '../types';
 
-    const actionData = useActionData();
+export default function SimulationDialog() {
+    const actionData = useActionData() as Simulation;
 
     const [open, setOpen] = useState(false)
 

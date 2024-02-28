@@ -35,3 +35,10 @@ export interface Lead {
     email: string;
     phone: string;
 }
+
+export interface Simulation {
+    carId: string;
+    id: string;
+    leadId: string;
+    score: number;
+}

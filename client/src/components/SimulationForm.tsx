@@ -12,7 +12,7 @@ import Typography from '@mui/joy/Typography';
 
 export default function SimulationForm() {
     const actionData = useActionData();
-    const formRef = useRef<HTMLFormElement>()
+    const formRef = useRef<HTMLFormElement | null>(null)
 
     useEffect(() => {
         formRef.current?.reset()
