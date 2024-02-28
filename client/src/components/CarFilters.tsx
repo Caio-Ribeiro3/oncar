@@ -23,6 +23,7 @@ export default function CarFilters() {
     const { brands } = useLoaderData() as Awaited<ReturnType<typeof loader>>
     const [searchParams] = useSearchParams();
     const [brand, setBrand] = React.useState<string>(brands.find(el => el.id === searchParams.get('brand'))?.id || '')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const submit = React.useCallback(debounce(useSubmit(), 1000), []);
 
     const formRef = React.useRef<HTMLFormElement>()

@@ -9,11 +9,11 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import { PaginatedEntity } from '../types';
 
 
-type TablePagination<ReturnOfUseLoaderData, EntityType> = {
+type TablePaginationProps<ReturnOfUseLoaderData, EntityType> = {
     getPagination(payload: ReturnOfUseLoaderData): PaginatedEntity<EntityType>
 }
 
-export default function TablePagination<ReturnOfUseLoaderData, EntityType>(props: TablePagination<ReturnOfUseLoaderData, EntityType>) {
+export default function TablePagination<ReturnOfUseLoaderData, EntityType>(props: TablePaginationProps<ReturnOfUseLoaderData, EntityType>) {
     const { getPagination } = props
 
     const loaderData = useLoaderData() as Awaited<ReturnOfUseLoaderData>
